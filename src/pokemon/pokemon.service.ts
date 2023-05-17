@@ -21,10 +21,7 @@ export class PokemonService {
       const pokemon = await this.pokemonModel.create( createPokemon );
       return pokemon;
     } catch (error) {
-      if( error.code === 11000){
-        throw new BadRequestException(`Pokemos already exist with property ${error.keyValue}`)
-      }
-      throw new InternalServerErrorException(`Internal error :(`)
+      this.handleExceptions( error );
     }
   }
 
@@ -55,8 +52,7 @@ export class PokemonService {
 
   async update(term: string, updatePokemonDto: UpdatePokemonDto) {
    try {
-      const pokemon = (await this.findOne(term));
-      console.log(pokemon)
+      const pokemon = await this.findOne(term);
       if( updatePokemonDto.name ){
         pokemon.name = updatePokemonDto.name;
       }
@@ -66,12 +62,19 @@ export class PokemonService {
       await pokemon.save();
       return { ...pokemon.toObject(), ...updatePokemonDto }
    } catch (err) {
-      if( err.code === 11000 ) throw new BadRequestException(`Pokemos already exist with property ${err.keyValue}`);
-      throw new InternalServerErrorException(`Internal error :(`)
+      this.handleExceptions( err )
    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} pokemon`;
+  async remove(_id: string) {
+    const { deletedCount } = await this.pokemonModel.deleteOne({ _id });
+    if( deletedCount === 0 ) throw new BadRequestException(`Pokemon with id ${ _id } not found`);
+    return { success: true } 
+  }
+
+  private handleExceptions( error ) {
+    if( error.code === 11000 ) throw new BadRequestException(`Pokemon already exist with property ${JSON.stringify(error.keyValue)}`);
+    throw new InternalServerErrorException(`Internal error :(`)
+
   }
 }

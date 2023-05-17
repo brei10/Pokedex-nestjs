@@ -6,6 +6,9 @@ import { ServiceHelloWorld } from './app.service';
 import { AppController } from './app.controller';
 import { PokemonModule } from './pokemon/pokemon.module';
 import { MongooseModule } from '@nestjs/mongoose';
+import { CommonModule } from './common/common.module';
+import { SeedModule } from './seed/seed.module';
+import { SeedService } from './seed/seed.service';
 
 @Module({
   imports: [
@@ -14,9 +17,12 @@ import { MongooseModule } from '@nestjs/mongoose';
     }),
     PokemonModule,
     MongooseModule.forRoot('mongodb+srv://BREI10:Breiner1003@cluster0.brlewbd.mongodb.net/'),
-     ConfigModule.forRoot()
+    ConfigModule.forRoot(),
+    SeedModule,
+    CommonModule,
+    
   ],
   controllers: [AppController],
-  providers: [ServiceHelloWorld],
+  providers: [ServiceHelloWorld, SeedService],
 })
 export class AppModule {}
