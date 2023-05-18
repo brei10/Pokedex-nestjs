@@ -8,8 +8,8 @@ export class SeedController {
   constructor(private readonly seedService: SeedService) {}
 
   @Get()
-  executeSeed() {
-    return this.seedService.executeSeed();
+  async executeSeed() {
+    return await this.seedService.executeSeed();
   }
 
 }
